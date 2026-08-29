@@ -26,6 +26,8 @@ type Ctx = {
   pointLabel: string;
   /** Hero photograph for the side currently being spoken from. */
   hero: { src: string; alt: string; caption: string };
+  /** The claim in plain words, for the space beneath the quadrant. */
+  standing: string;
 };
 
 const PovContext = createContext<Ctx | null>(null);
@@ -57,13 +59,14 @@ export function PovProvider({ children }: { children: ReactNode }) {
         : { sec: -secGap, eco: ecoGap },
       centreLabel: rahul ? "Modi’s India" : "Rahul’s India",
       pointLabel: rahul ? "Rahul’s projected India" : "Modi’s India",
+      standing: rahul ? "India is less safe and poorer" : "India is richer and safer",
       hero: rahul
         ? { src: "img/hero.jpg",
             alt: "Rahul Gandhi speaking at a podium before the Red Fort, New Delhi",
-            caption: "Counterfactual scenario. The estimated path is built from comparator countries, not from any individual’s stated policy programme." }
+            caption: "In this synthetic reality, Modi failed in 2014 and Rahul became Prime Minister of India and continued UPA policies. We look into it and see how that India would be." }
         : { src: "img/modi.jpg",
             alt: "Narendra Modi speaking at a podium before the Red Fort, New Delhi",
-            caption: "The India that actually happened, measured against the estimated alternative." },
+            caption: "This is the reality we live — Modi is our Prime Minister." },
     };
   }, [pov]);
   return <PovContext.Provider value={value}>{children}</PovContext.Provider>;

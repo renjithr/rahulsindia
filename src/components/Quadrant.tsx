@@ -15,7 +15,7 @@ const PAD = { t: 34, r: 46, b: 48, l: 50 };
 const SEC = 80, ECO = 20;
 
 export function Quadrant({ data }: { data: QuadrantData }) {
-  const { pov, centreLabel, pointLabel, point, otherSubject } = usePov();
+  const { pov, centreLabel, pointLabel, point, otherSubject, standing } = usePov();
   const rahulView = pov === "rahul";
   const iw = W - PAD.l - PAD.r, ih = H - PAD.t - PAD.b;
   const clamp = (v: number, m: number) => Math.max(-m, Math.min(m, v));
@@ -116,6 +116,11 @@ export function Quadrant({ data }: { data: QuadrantData }) {
           </div>
         ))}
       </dl>
+
+      <p className={`mt-8 max-w-[18ch] font-display text-3xl font-bold leading-[1.15]
+                     tracking-tight sm:text-4xl ${rahulView ? "text-rahulInk" : "text-modiInk"}`}>
+        {standing}
+      </p>
     </figure>
   );
 }

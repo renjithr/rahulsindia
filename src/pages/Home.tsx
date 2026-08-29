@@ -118,7 +118,9 @@ export default function Home() {
                 ))}
               </dl>
               <dl className="mt-5 border-t border-border pt-5">
-                <dt className="eyebrow">Modi ahead on observed change</dt>
+                <dt className="eyebrow">
+                  {pov === "rahul" ? "Rahul is behind" : "Modi ahead on observed change"}
+                </dt>
                 <dd className="num mt-1 text-2xl text-modiInk">{modiAhead}/{every.length}</dd>
                 <dd className="mt-1 max-w-reading font-ui text-[11px] leading-relaxed text-muted">
                   A separate count, and a weaker one. Most of these compare India to its own past

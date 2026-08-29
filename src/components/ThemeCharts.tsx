@@ -2,7 +2,9 @@ import {
   ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, ReferenceLine, Cell,
 } from "recharts";
+import { Link } from "react-router-dom";
 import { fmt } from "../lib/format";
+import { gapFrom, type Side } from "./Sectors";
 import type { Dataset } from "../lib/types";
 
 type Item = Dataset["modiPage"]["themes"][number]["items"][number];
@@ -75,22 +77,56 @@ export function ThemeBars({ item }: { item: Item }) {
   );
 }
 
-/** Theme summary as a heat strip — one cell per indicator, shaded by size of gain. */
-export function ThemeHeat({ items }: { items: Item[] }) {
-  const mx = Math.max(...items.map((i) => Math.abs(i.gap)));
+/**
+ * Theme summary as a heat strip — one cell per indicator, shaded by size of gain.
+ *
+ * Each cell names its indicator and states the direction: a bare "210% higher"
+ * says nothing about what is higher, or higher than what. Direction comes from
+ * the sign of the gap rather than the `lower` flag, so it stays right even for
+ * an indicator that moves against its own better direction.
+ */
+export function ThemeHeat({ items, side = "modi" }: { items: Item[]; side?: Side }) {
+  const modiSide = side === "modi";
+  // Blue is far darker than the orange at equal alpha, so it gets a shallower
+  // ramp: at 0.9 alpha the tile luminance drops to ~0.16 and neither dark nor
+  // light 10px text clears 4.5:1 against it. Capping at 0.62 keeps every tile
+  // readable with the same dark ink both sides use.
+  const rgb = modiSide ? "210,105,30" : "29,95,168";
+  const lo = modiSide ? 0.18 : 0.12;
+  const span = modiSide ? 0.72 : 0.5;
+  const gaps = items.map((i) => gapFrom(side, i));
+  const mx = Math.max(...gaps.map(Math.abs));
   return (
-    <ul className="grid gap-2 sm:grid-cols-5">
-      {items.map((i) => {
-        const o = 0.18 + 0.72 * (Math.abs(i.gap) / mx);
-        return (
-          <li key={i.id} className="rounded-md p-3" style={{ background: `rgba(210,105,30,${o})` }}>
-            <p className="num text-lg text-ink">{Math.abs(i.gap).toFixed(0)}%</p>
-            <p className="mt-0.5 font-ui text-[10px] leading-tight text-ink/75">
-              {i.lower ? "lower" : "higher"}
-            </p>
-          </li>
-        );
-      })}
-    </ul>
+    <>
+      <p className="mb-3 font-ui text-[11px] leading-relaxed text-muted">
+        One tile per indicator — {modiSide ? "Modi" : "Rahul"}&rsquo;s India measured against{" "}
+        {modiSide ? "Rahul" : "Modi"}&rsquo;s India over the same years. Shading tracks the size
+        of the difference.
+      </p>
+      <ul className="grid gap-2 sm:grid-cols-5">
+        {items.map((i, n) => {
+          const g = gaps[n];
+          const o = lo + span * (Math.abs(g) / mx);
+          return (
+            <li key={i.id}>
+              <Link to={`/indicator/${i.id}`}
+                className="flex h-full flex-col rounded-md p-3 transition-transform
+                           duration-300 hover:-translate-y-0.5"
+                style={{ background: `rgba(${rgb},${o})` }}>
+                <span className="line-clamp-2 font-ui text-[11px] leading-tight text-ink/90">
+                  {i.title}
+                </span>
+                <span className="num mt-auto pt-2 text-lg leading-none text-ink">
+                  {Math.abs(g).toFixed(0)}%
+                </span>
+                <span className="mt-1 font-ui text-[10px] leading-tight text-ink/90">
+                  {g < 0 ? "lower" : "higher"} than {modiSide ? "Rahul" : "Modi"}&rsquo;s India
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </>
   );
 }

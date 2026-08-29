@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
-import { data, untestable, COUNTRY } from "../lib/data";
+import { data, all, untestable, COUNTRY } from "../lib/data";
 import { Chart } from "../components/Chart";
 import { quadrantVerdict, fmt } from "../lib/format";
 import { Robustness } from "../components/Robustness";
 import { everyday, byGroup } from "../lib/everyday";
 import { SecurityDecade } from "../components/SecurityDecade";
+import { Sectors } from "../components/Sectors";
+import { SwitchSideBlock } from "../components/SwitchSide";
+import { SecurityRadar } from "../components/SecurityRadar";
 
 /** Combined annual fatalities across the three theatres, drawn as bars. */
 function SecurityBars() {
@@ -38,15 +41,16 @@ export default function Read() {
   const sec = data.quadrant.security;
   const s = data.securitySeries;
   const secCards = untestable.filter((u) => u.set === "security");
+  const rahulAhead = [...all, ...untestable].filter((i) => i.verdictSide === "rahul");
   const combinedChange = (100 * (s.postMean - s.preMean)) / s.preMean;
 
   return (
-    <article className="mx-auto max-w-4xl px-6 py-14">
+    <article className="mx-auto max-w-5xl px-6 py-14">
       <Link to="/" className="eyebrow inline-flex items-center gap-2 transition-colors
                               duration-300 hover:text-rahulInk">← Back to the comparison</Link>
 
       <header className="mt-6 border-b border-border pb-10">
-        <p className="eyebrow mb-4">The evidence · 2014 – 2024</p>
+        <p className="eyebrow mb-4">The counterfactual · 2014 – 2024</p>
         <h1 className="max-w-[26ch] font-display text-4xl leading-[1.12] tracking-tight sm:text-5xl">
           Rahul&rsquo;s India would have been{" "}
           <span className="italic text-rahulInk">{v.ecoPhrase}</span>
@@ -57,13 +61,113 @@ export default function Read() {
           )}
         </h1>
         <p className="mt-6 max-w-reading font-body text-lg leading-relaxed text-muted">
-          Two numbers, reached two different ways. This page shows the working behind each.
+          The same two comparisons, read from this side. Where the Modi page asks what India
+          gained, this asks what it would have lost — across the economy, health, infrastructure
+          and internal security. The working behind both numbers is at the foot of the page.
         </p>
       </header>
 
+      {/* headline pair — the Modi page's opening, flipped */}
+      <section className="grid gap-12 border-b border-border py-14 lg:grid-cols-2">
+        <figure className="min-w-0">
+          <p className="eyebrow">Income · real GDP per capita, PPP</p>
+          <p className="num mt-2 text-4xl text-rahulInk">
+            −{Math.abs(eco.gapPct).toFixed(0)}<span className="text-2xl">%</span>
+          </p>
+          <p className="mb-6 mt-1 font-ui text-[13px] text-muted">
+            {fmt(eco.actual, "USD")} actual · {fmt(eco.synth, "USD")} projected
+          </p>
+          <Chart series={eco.series} unit="USD" height={230} />
+          <SwitchSideBlock to="modi" />
+        </figure>
+        <figure className="min-w-0">
+          <p className="eyebrow">Security · all-theatre fatalities a year</p>
+          <p className="num mt-2 text-4xl text-rahulInk">
+            +{Math.abs(sec.gapPct).toFixed(0)}<span className="text-2xl">%</span>
+          </p>
+          <p className="mb-6 mt-1 font-ui text-[13px] text-muted">
+            {sec.actual.toLocaleString()} a year after 2014 · {sec.synth.toLocaleString()} before
+          </p>
+          <SecurityRadar />
+        </figure>
+      </section>
+
+      <Sectors side="rahul" startAt={2} />
+
+      <section className="border-b border-border py-14">
+        <p className="eyebrow mb-3">{everyday.label}</p>
+        <h2 className="font-display text-3xl">
+          {everyday.title} — <span className="num text-rahulInk">{everyday.counts.earlier} earlier-period leads</span>
+        </h2>
+        <p className="mt-4 max-w-reading font-ui text-sm leading-relaxed text-muted">
+          On {everyday.counts.earlier} of the {everyday.counts.total} selected lived-development
+          measures, the earlier period improved faster once starting position is accounted for.
+        </p>
+        <dl className="mt-8 grid gap-x-8 gap-y-5 sm:grid-cols-3">
+          {Object.entries(byGroup("earlier").reduce((acc, i) => {
+            (acc[i.category] ||= []).push(i.name); return acc;
+          }, {} as Record<string, string[]>)).map(([cat, names]) => (
+            <div key={cat} className="border-t border-border pt-3">
+              <dt className="eyebrow">{cat}</dt>
+              <dd className="mt-1.5 font-ui text-[12px] leading-relaxed text-muted">
+                {names.join(" · ")}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-8 max-w-reading rounded-md border-l-2 border-rahul/40 bg-rahul/[0.04]
+                      px-4 py-3 font-ui text-[13px] leading-relaxed text-muted">
+          The earlier period also established substantial progress on several other measures,
+          including institutional births and skilled birth attendance. After adjusting for
+          starting position, {everyday.counts.comparable} of those are classified as broadly
+          comparable rather than a lead for either side.{" "}
+          <Link to="/everyday" className="text-rahulInk underline-offset-2 hover:underline">
+            See all {everyday.counts.total}
+          </Link>.
+        </p>
+      </section>
+
+      {/* ── where the counterfactual wins ──────────────────────────── */}
+      <section className="border-b border-border py-14">
+        <p className="eyebrow mb-3">06 — Where Rahul&rsquo;s India is ahead</p>
+        <h2 className="font-display text-3xl">
+          <span className="num text-rahulInk">{rahulAhead.length}</span> national indicators run
+          the other way
+        </h2>
+        <p className="mt-4 max-w-reading font-ui text-sm leading-relaxed text-muted">
+          Most of this page describes a shortfall. These do not: on these measures the estimated
+          path, or the earlier period, is the one in front. They are a small minority, and shown
+          here rather than buried because a page that only reported losses would not be worth
+          trusting on the rest.
+        </p>
+
+        <ul className="mt-8 divide-y divide-border border-y border-border">
+          {rahulAhead.map((i) => (
+            <li key={i.id}>
+              <Link to={`/indicator/${i.id}`}
+                className="group flex flex-wrap items-baseline gap-x-4 gap-y-1 py-3
+                           transition-colors duration-300 hover:bg-rahul/[0.04]">
+                <span className="min-w-0 flex-1 font-ui text-[13px] group-hover:text-rahulInk">
+                  {i.title}
+                </span>
+                <span className="eyebrow">national indicator</span>
+                <span className="num w-20 text-right text-sm text-rahulInk">Rahul leads</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-6 max-w-reading font-ui text-[13px] leading-relaxed text-muted">
+          {everyday.counts.earlier} more sit in the Everyday India layer directly above, scored on
+          normalised rates of improvement so a period that started further behind is not credited
+          for the easier gains.
+        </p>
+      </section>
+
+
       {/* ── 13% poorer ─────────────────────────────────────────────── */}
       <section className="border-b border-border py-14">
-        <p className="eyebrow mb-3">01 — The wealth gap</p>
+        <p className="eyebrow mb-3">07 — The wealth gap</p>
         <h2 className="font-display text-3xl">
           <span className="num text-rahulInk">{Math.abs(v.eco).toFixed(0)}%</span> poorer
         </h2>
@@ -73,10 +177,6 @@ export default function Read() {
           economies whose pre-2014 paths tracked India&rsquo;s — is the blue dashed line. The two
           are indistinguishable before 2014 by construction, and separate afterwards.
         </p>
-
-        <div className="mt-8">
-          <Chart series={eco.series} unit="USD" height={320} />
-        </div>
 
         <dl className="mt-8 grid gap-6 border-t border-border pt-6 sm:grid-cols-4">
           {[
@@ -115,20 +215,9 @@ export default function Read() {
         </div>
       </section>
 
-      {/* ── does the 13% hold? ─────────────────────────────────────── */}
-      <section className="border-b border-border py-14">
-        <p className="eyebrow mb-3">01b — Does it hold?</p>
-        <h2 className="font-display text-3xl">Four ways to break the wealth figure</h2>
-        <p className="mb-8 mt-4 max-w-reading font-ui text-sm leading-relaxed text-muted">
-          A gap against a counterfactual is only as good as the counterfactual. These are the
-          standard attacks on a synthetic control estimate, run against this one.
-        </p>
-        <Robustness />
-      </section>
-
       {/* ── the security number ─────────────────────────────────────── */}
       <section className="border-b border-border py-14">
-        <p className="eyebrow mb-3">02 — The security gap</p>
+        <p className="eyebrow mb-3">08 — The security gap</p>
         <h2 className="font-display text-3xl">
           <span className="num text-rahulInk">{Math.abs(v.sec).toFixed(0)}%</span> less secure
         </h2>
@@ -262,42 +351,8 @@ export default function Read() {
         </p>
       </section>
 
-      {/* ── the two methods ────────────────────────────────────────── */}
-      <section className="border-b border-border py-14">
-        <p className="eyebrow mb-3">{everyday.label}</p>
-        <h2 className="font-display text-3xl">
-          {everyday.title} — <span className="num text-rahulInk">{everyday.counts.earlier} earlier-period leads</span>
-        </h2>
-        <p className="mt-4 max-w-reading font-ui text-sm leading-relaxed text-muted">
-          On {everyday.counts.earlier} of the {everyday.counts.total} selected lived-development
-          measures, the earlier period improved faster once starting position is accounted for.
-        </p>
-        <dl className="mt-8 grid gap-x-8 gap-y-5 sm:grid-cols-3">
-          {Object.entries(byGroup("earlier").reduce((acc, i) => {
-            (acc[i.category] ||= []).push(i.name); return acc;
-          }, {} as Record<string, string[]>)).map(([cat, names]) => (
-            <div key={cat} className="border-t border-border pt-3">
-              <dt className="eyebrow">{cat}</dt>
-              <dd className="mt-1.5 font-ui text-[12px] leading-relaxed text-muted">
-                {names.join(" · ")}
-              </dd>
-            </div>
-          ))}
-        </dl>
-        <p className="mt-8 max-w-reading rounded-md border-l-2 border-rahul/40 bg-rahul/[0.04]
-                      px-4 py-3 font-ui text-[13px] leading-relaxed text-muted">
-          The earlier period also established substantial progress on several other measures,
-          including institutional births and skilled birth attendance. After adjusting for
-          starting position, {everyday.counts.comparable} of those are classified as broadly
-          comparable rather than a lead for either side.{" "}
-          <Link to="/everyday" className="text-rahulInk underline-offset-2 hover:underline">
-            See all {everyday.counts.total}
-          </Link>.
-        </p>
-      </section>
-
       <section className="py-14">
-        <p className="eyebrow mb-3">03 — The two numbers are not alike</p>
+        <p className="eyebrow mb-3">09 — The two numbers are not alike</p>
         <h2 className="font-display text-3xl">One is tested, one is arithmetic</h2>
         <div className="mt-8 grid gap-8 sm:grid-cols-2">
           <div className="rounded-lg border border-border bg-surface p-5">
@@ -321,6 +376,18 @@ export default function Read() {
             </p>
           </div>
         </div>
+      </section>
+
+      {/* ── does the 13% hold? — the methods block, parked at the bottom ── */}
+      <section className="border-t border-border py-14">
+        <p className="eyebrow mb-3">10 — Does it hold?</p>
+        <h2 className="font-display text-3xl">Four ways to break the wealth figure</h2>
+        <p className="mb-8 mt-4 max-w-reading font-ui text-sm leading-relaxed text-muted">
+          A gap against a counterfactual is only as good as the counterfactual. These are the
+          standard attacks on a synthetic control estimate, run against this one.
+        </p>
+        <Robustness />
+
         <div className="mt-10 flex flex-wrap gap-3">
           <Link to="/" className="rounded-full border border-border bg-surface px-5 py-2.5
                                   font-ui text-sm transition-all duration-300
