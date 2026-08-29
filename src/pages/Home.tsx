@@ -18,6 +18,7 @@ export default function Home() {
     "Roads, Railways, Airports, Metros and Waterways",
     "Energy and Household Infrastructure",
     "Manufacturing and Defence",
+    "Housing",
   ]);
   const observedCards = untestable.filter((u) => u.set !== "security");
   const built = observedCards.filter((u) => BUILT.has(u.category));
