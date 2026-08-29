@@ -14,7 +14,6 @@ import puppeteer from "puppeteer";
 
 const DIST = new URL("../dist/", import.meta.url).pathname;
 const PORT = 45671;
-const BASE = "/rahulsindia";
 
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css",
   ".json": "application/json", ".svg": "image/svg+xml", ".jpg": "image/jpeg", ".png": "image/png" };
@@ -28,7 +27,6 @@ async function routes() {
 
 const server = createServer(async (req, res) => {
   let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-  if (p.startsWith(BASE)) p = p.slice(BASE.length) || "/";
   let file = join(DIST, p);
   if (!extname(file) || !existsSync(file)) file = join(DIST, "index.html");
   try {
@@ -45,7 +43,7 @@ const list = await routes();
 let n = 0;
 
 for (const route of list) {
-  await page.goto(`http://localhost:${PORT}${BASE}${route === "/" ? "/" : route}`,
+  await page.goto(`http://localhost:${PORT}${route}`,
     { waitUntil: "networkidle0", timeout: 45000 });
   await page.waitForSelector("#root > *", { timeout: 20000 });
   const html = await page.content();

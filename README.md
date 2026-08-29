@@ -15,7 +15,7 @@ source, and the browser cannot execute `src/main.tsx`, so the page renders blank
 
 The site lives under a sub-path, which two settings depend on:
 
-    vite.config.ts   base: '/rahulsindia/'      asset URLs
+    vite.config.ts   base: '/'                 asset URLs
     src/App.tsx      basename={BASE_URL}        router paths
 
 Both read from the same value, and `base` applies to production builds only so
