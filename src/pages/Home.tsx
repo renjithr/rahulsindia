@@ -13,8 +13,21 @@ import { ObservedCard } from "../components/ObservedCard";
 export default function Home() {
   const sig = data.tier1.filter((i) => i.significant).length;
   const every = [...all, ...untestable];
-  const modiAhead = every.filter((i) => i.verdictSide === "modi").length;
-  const rahulAhead = every.filter((i) => i.verdictSide === "rahul").length;
+  // Capacity the state builds, against outcomes households live with.
+  const BUILT = new Set([
+    "Roads, Railways, Airports, Metros and Waterways",
+    "Energy and Household Infrastructure",
+    "Manufacturing and Defence",
+  ]);
+  const observedCards = untestable.filter((u) => u.set !== "security");
+  const built = observedCards.filter((u) => BUILT.has(u.category));
+  const households = observedCards.filter((u) => !BUILT.has(u.category));
+  // Both layers count into one total. The national indicators are measured
+  // against a counterfactual or against India's own past; the Everyday measures
+  // are scored on normalised rates of improvement. Different methods, one count.
+  const total = every.length + everyday.counts.total;
+  const modiAhead = every.filter((i) => i.verdictSide === "modi").length + everyday.counts.later;
+  const rahulAhead = every.filter((i) => i.verdictSide === "rahul").length + everyday.counts.earlier;
   const { pov, verdict, subject, otherSubject, hero } = usePov();
 
   return (
@@ -24,8 +37,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl items-start gap-10 px-6 pb-14 pt-16 lg:grid-cols-12 lg:gap-14 lg:pt-24">
           <div className="min-w-0 lg:col-span-6">
             <p className="eyebrow mb-5">
-              {every.length} national indicators · {everyday.counts.total} everyday measures ·
-              two trajectories
+              {total} indicators · two trajectories · one comparison
             </p>
             <h1 className="font-display text-4xl leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl">
               The India the headlines don&rsquo;t{" "}
@@ -38,7 +50,7 @@ export default function Home() {
               and state capacity?
             </p>
             <p className="mt-4 max-w-reading font-body text-lg leading-relaxed text-muted">
-              Across {every.length} indicators it compares the India that emerged under Narendra
+              Across {total} indicators it compares the India that emerged under Narendra
               Modi with an estimated alternative —{" "}
               <span className="text-ink">what if Rahul Gandhi had become Prime Minister in 2014
               and the broad UPA-era trajectory had continued?</span>{" "}
@@ -64,7 +76,7 @@ export default function Home() {
             </div>
 
             <dl className="mt-9 border-t border-border pt-6">
-              <dt className="eyebrow">Plus {everyday.counts.total} Everyday India measures</dt>
+              <dt className="eyebrow">Of which {everyday.counts.total} are Everyday India measures</dt>
               <dd className="mt-1.5 flex flex-wrap items-baseline gap-x-4 gap-y-1">
                 <span className="num text-2xl text-modiInk">{everyday.counts.later}</span>
                 <span className="font-ui text-[11px] text-muted">Modi ahead</span>
@@ -74,9 +86,9 @@ export default function Home() {
                 <span className="font-ui text-[11px] text-muted">comparable</span>
               </dd>
               <dd className="mt-1.5 max-w-reading font-ui text-[11px] leading-relaxed text-muted">
-                A second layer, counted separately. Basic lived-development outcomes scored on
-                normalised rates of improvement rather than against a counterfactual — never
-                added to the {every.length} above.
+                Basic lived-development outcomes, scored on normalised rates of improvement
+                rather than against a counterfactual. Counted in the {total}, and broken out here
+                so the method behind them is not mistaken for the rest.
               </dd>
             </dl>
           </div>
@@ -107,7 +119,7 @@ export default function Home() {
             </figure>
               <dl className="mt-8 grid grid-cols-3 gap-6 border-t border-border pt-6">
                 {[
-                  ["National indicators", String(every.length)],
+                  ["Indicators", String(total)],
                   ["With a counterfactual", String(data.tier1.length)],
                   ["Significant at p ≤ 0.10", String(sig)],
                 ].map(([k, v]) => (
@@ -121,7 +133,7 @@ export default function Home() {
                 <dt className="eyebrow">
                   {pov === "rahul" ? "Rahul is behind" : "Modi ahead on observed change"}
                 </dt>
-                <dd className="num mt-1 text-2xl text-modiInk">{modiAhead}/{every.length}</dd>
+                <dd className="num mt-1 text-2xl text-modiInk">{modiAhead}/{total}</dd>
                 <dd className="mt-1 max-w-reading font-ui text-[11px] leading-relaxed text-muted">
                   A separate count, and a weaker one. Most of these compare India to its own past
                   rather than to an estimated alternative, and none is a significance test.
@@ -228,13 +240,17 @@ export default function Home() {
       {/* ── Carousels: every indicator, grouped by what the method can say ── */}
       <section className="mx-auto max-w-7xl px-6 pb-24" aria-labelledby="all">
         <div className="mb-10 border-b border-border pb-5">
-          <h2 id="all" className="font-display text-3xl tracking-tight sm:text-4xl">
-            Indicator by indicator
+          <h2 id="all" className="max-w-[24ch] font-display text-3xl leading-[1.15]
+                                   tracking-tight sm:text-4xl">
+            What Modi era built: Comparison with previous era and Rahul&rsquo;s India
           </h2>
           <p className="mt-2 max-w-reading font-ui text-sm text-muted">
-            All {every.length} indicators, grouped by what an estimated
-            alternative can establish. Where the data cannot support one, the card says so
-            rather than being left out.
+            The {every.length} national indicators, grouped by what an estimated alternative
+            can establish — {data.tier1.length} measured against a counterfactual,{" "}
+            {data.tier2.length} estimated but not interpretable, and{" "}
+            {untestable.length} on observed change alone. Where the data cannot support a
+            counterfactual, the card says so rather than being left out. The other{" "}
+            {everyday.counts.total} of the {total} are the Everyday India measures, below.
           </p>
           <p className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 font-ui text-xs text-muted">
             <span className="inline-flex items-center gap-2">
@@ -276,6 +292,9 @@ export default function Home() {
               <div className="mb-5 flex flex-wrap items-baseline gap-x-4 gap-y-1">
                 <h3 className="font-display text-2xl">
                   <span className="num mr-3 text-base text-muted">{g.n}</span>{g.title}
+                  <span className="num ml-3 text-base font-normal text-muted">
+                    {g.items.length}
+                  </span>
                 </h3>
                 <p className="max-w-reading font-ui text-xs leading-relaxed text-muted">{g.blurb}</p>
               </div>
@@ -283,25 +302,49 @@ export default function Home() {
             </div>
           ))}
 
-          <div>
-            <div className="mb-5 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-              <h3 className="font-display text-2xl">
-                <span className="num mr-3 text-base text-muted">3</span>No counterfactual possible
-              </h3>
-              <p className="max-w-reading font-ui text-xs leading-relaxed text-muted">
-                No comparable cross-country series exists. The verdict compares observed Indian
-                figures from 2014 to the latest available year — a weaker basis than an
-                estimated counterfactual.
-              </p>
+          {/* Thirty-six cards in one rail meant scrolling past twenty unrelated
+              indicators to reach a given one. Split by what the measure is:
+              capacity the state builds, and outcomes households live with. */}
+          {[
+            {
+              key: "built", n: 3, title: "What was built",
+              blurb: "Physical stock and industrial capacity — road, rail, port, metro and waterway " +
+                     "networks, generating capacity, and manufacturing and defence output. No usable " +
+                     "cross-country series exists for these, so the verdict compares observed Indian " +
+                     "figures from 2014 to the latest available year.",
+              items: built,
+            },
+            {
+              key: "households", n: 4, title: "What households got",
+              blurb: "Outcomes people live with — bank accounts, sanitation, poverty, schooling, " +
+                     "health. Some have no comparator series at all; a few have one that is an " +
+                     "interpolated trend and cannot carry a counterfactual. Either way the verdict " +
+                     "is observed change, a weaker basis than an estimate.",
+              items: households,
+            },
+          ].map((g) => (
+            <div key={g.key}>
+              <div className="mb-5 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <h3 className="font-display text-2xl">
+                  <span className="num mr-3 text-base text-muted">{g.n}</span>{g.title}
+                  <span className="num ml-3 text-base font-normal text-muted">
+                    {g.items.length}
+                  </span>
+                </h3>
+                <p className="max-w-reading font-ui text-xs leading-relaxed text-muted">{g.blurb}</p>
+              </div>
+              <Carousel items={g.items} keyOf={(u) => u.id} label={g.title}
+                render={(u) => <ObservedCard item={u} />} />
             </div>
-            <Carousel items={untestable.filter((u) => u.set !== "security")} keyOf={(u) => u.id}
-              label="No counterfactual possible" render={(u) => <ObservedCard item={u} />} />
-          </div>
+          ))}
 
           <div>
             <div className="mb-5 flex flex-wrap items-baseline gap-x-4 gap-y-1">
               <h3 className="font-display text-2xl">
-                <span className="num mr-3 text-base text-muted">4</span>Internal security
+                <span className="num mr-3 text-base text-muted">5</span>Internal security
+                <span className="num ml-3 text-base font-normal text-muted">
+                  {untestable.filter((u) => u.set === "security").length}
+                </span>
               </h3>
               <p className="max-w-reading font-ui text-xs leading-relaxed text-muted">
                 Jammu &amp; Kashmir, left-wing extremism and the Northeast, from Home Ministry
@@ -331,8 +374,8 @@ export default function Home() {
                 {everyday.counts.total} additional measures of lived development — health coverage,
                 maternal care, vaccination, nutrition and social outcomes that can affect millions
                 of people but rarely dominate political debate in wealthy societies. Counted
-                separately from the {every.length} national indicators, because the two answer
-                different questions.
+                alongside the {every.length} national indicators, and scored a different way
+                because the two answer different questions.
               </p>
               <Link to="/everyday"
                 className="group mt-8 inline-flex items-center gap-2 rounded-full border

@@ -47,6 +47,12 @@ export default function Observed({ item }: { item: Untestable }) {
             ? `Comparable data exists for ${item.peers?.n} countries but begins in ` +
               `${item.peers?.years[0]}, leaving too few pre-2014 years to fit a synthetic ` +
               `counterfactual. India is placed against those peers directly instead.`
+            // Most of these have no cross-country series at all. Some do, and it is the
+            // series itself that cannot carry a counterfactual — an interpolated trend,
+            // say. Where the record explains which, it is more use than the default.
+            : item.reason && item.reason.length > 60
+            ? `${item.reason} The verdict here compares observed Indian figures over time — ` +
+              "a weaker basis than the estimated indicators."
             : "No comparable cross-country series exists for this measure, so no synthetic " +
               "counterfactual can be estimated. The verdict here compares observed Indian " +
               "figures over time — a weaker basis than the estimated indicators."}

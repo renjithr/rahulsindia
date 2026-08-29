@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { data } from "../lib/data";
+import { everyday } from "../lib/everyday";
 
 /** The dimensions this project measures, against those that dominate coverage. */
 const OFTEN_COVERED = [
@@ -128,7 +129,8 @@ export function ThreeStages() {
 export function Fairness() {
   const t1 = data.tier1;
   const notSig = t1.filter((x) => x.p !== null && x.p > 0.1).length;
-  const rahulAhead = [...t1, ...data.untestable].filter((x) => x.verdictSide === "rahul").length;
+  const rahulAhead = [...t1, ...data.untestable].filter((x) => x.verdictSide === "rahul").length
+    + everyday.counts.earlier;
   return (
     <section className="border-t border-border bg-surface/40" aria-labelledby="fair">
       <div className="mx-auto max-w-7xl px-6 py-20">

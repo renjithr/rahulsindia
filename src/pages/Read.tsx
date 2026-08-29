@@ -131,14 +131,14 @@ export default function Read() {
       <section className="border-b border-border py-14">
         <p className="eyebrow mb-3">06 — Where Rahul&rsquo;s India is ahead</p>
         <h2 className="font-display text-3xl">
-          <span className="num text-rahulInk">{rahulAhead.length}</span> national indicators run
-          the other way
+          <span className="num text-rahulInk">{rahulAhead.length}</span>{" "}
+          national {rahulAhead.length === 1 ? "indicator runs" : "indicators run"} the other way
         </h2>
         <p className="mt-4 max-w-reading font-ui text-sm leading-relaxed text-muted">
-          Most of this page describes a shortfall. These do not: on these measures the estimated
-          path, or the earlier period, is the one in front. They are a small minority, and shown
-          here rather than buried because a page that only reported losses would not be worth
-          trusting on the rest.
+          Most of this page describes a shortfall. {rahulAhead.length === 1 ? "This one does" : "These do"}{" "}
+          not: here the estimated path is the one in front. A small minority, and shown rather
+          than buried because a page that only reported losses would not be worth trusting on
+          the rest.
         </p>
 
         <ul className="mt-8 divide-y divide-border border-y border-border">

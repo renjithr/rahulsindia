@@ -71,9 +71,11 @@ export function ObservedCard({ item }: { item: Untestable }) {
         </span>
       </div>
 
-      <p className="mt-3 font-ui text-[11px] leading-relaxed text-muted">
-        {item.basis === "peers" ? "Peer comparison" : "No counterfactual"} · {item.reason}
-      </p>
+      {/* The reason lives on the detail page. Card heights are equalised across
+          the rail, so one long note here stretched every card beside it. */}
+      <span className="mt-3 font-ui text-[11px] text-muted">
+        {item.basis === "peers" ? "Peer comparison" : "No counterfactual"}
+      </span>
     </Link>
   );
 }
