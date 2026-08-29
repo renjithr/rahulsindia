@@ -80,7 +80,7 @@ export type QuadrantData = {
 
 export type Dataset = {
   meta: {
-    built: string; treatmentYear: number; method: string; caveat: string;
+    built: string; updated: string; treatmentYear: number; method: string; caveat: string;
     sources: string[]; donorPool: string[];
   };
   tier1: Indicator[]; tier2: Indicator[]; untestable: Untestable[];

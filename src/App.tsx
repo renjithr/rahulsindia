@@ -38,9 +38,20 @@ function Shell() {
               Switch to {otherSubject}
             </button>
           </div>
-          <p className="hidden font-ui text-[11px] text-muted sm:block">
-            Synthetic control · treatment year <span className="num">{data.meta.treatmentYear}</span>
-          </p>
+          <div className="hidden text-right font-ui text-[11px] leading-tight text-muted sm:block">
+            <p>
+              Synthetic control · treatment year{" "}
+              <span className="num">{data.meta.treatmentYear}</span>
+            </p>
+            <p className="mt-0.5">
+              Figures updated{" "}
+              <span className="num">
+                {new Date(data.meta.updated + "T00:00:00Z").toLocaleDateString("en-GB", {
+                  day: "numeric", month: "short", year: "numeric", timeZone: "UTC",
+                })}
+              </span>
+            </p>
+          </div>
         </div>
       </nav>
       <main id="main">
