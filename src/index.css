@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..700&family=Plus+Jakarta+Sans:wght@300..800&family=JetBrains+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+  body { @apply bg-background text-ink font-body antialiased; }
+  ::selection { @apply bg-rahul/15; }
+  :focus-visible { @apply outline-none ring-2 ring-primary/60 ring-offset-2 ring-offset-background; }
+}
+@layer utilities {
+  .rule      { @apply border-t border-border; }
+  .num       { @apply font-mono tabular-nums tracking-tight; }
+  .eyebrow   { @apply font-ui text-[11px] uppercase tracking-[0.18em] text-muted; }
+  .fade-up   { animation: fadeUp .6s cubic-bezier(.2,.7,.3,1) both; }
+}
+@keyframes fadeUp { from { opacity:0; transform: translateY(12px) } to { opacity:1; transform:none } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
