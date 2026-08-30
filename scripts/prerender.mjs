@@ -22,7 +22,7 @@ async function routes() {
   const raw = JSON.parse(await readFile(join(DIST, "assets", "data.json"), "utf8").catch(() => "null"))
     ?? JSON.parse(await readFile(new URL("../src/lib/data.json", import.meta.url), "utf8"));
   const ids = [...raw.tier1, ...raw.tier2, ...raw.untestable].map((x) => x.id);
-  return ["/", "/read", "/modi", "/everyday", ...ids.map((id) => `/indicator/${id}`)];
+  return ["/", "/read", "/modi", "/everyday", "/democracy", ...ids.map((id) => `/indicator/${id}`)];
 }
 
 const server = createServer(async (req, res) => {

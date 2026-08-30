@@ -4,6 +4,7 @@ import Detail from "./pages/Detail";
 import Read from "./pages/Read";
 import Modi from "./pages/Modi";
 import Everyday from "./pages/Everyday";
+import Democracy from "./pages/Democracy";
 import { data } from "./lib/data";
 import { PovProvider, usePov } from "./lib/pov";
 
@@ -61,6 +62,7 @@ function Shell() {
           <Route path="/read" element={<Read />} />
           <Route path="/modi" element={<Modi />} />
           <Route path="/everyday" element={<Everyday />} />
+          <Route path="/democracy" element={<Democracy />} />
         </Routes>
       </main>
       <footer className="rule mt-8">
