@@ -148,8 +148,12 @@ export default function Home() {
       {/* ── Four possible Indias ─────────────────────────────────────────── */}
       <section className="bg-surface/40" aria-labelledby="whole">
         <div className="mx-auto max-w-7xl px-6 py-20">
-          <div className="mb-12 grid items-start gap-10 lg:grid-cols-12">
-           <div className="min-w-0 lg:col-span-7">
+          {/* Copy, audit card, quadrant and radar share one grid so the card can
+              sit beside the headline on desktop and drop below the charts on
+              mobile — where, stacked, it otherwise cut the headline off from the
+              quadrant that illustrates it. */}
+          <div className="grid items-start gap-x-10 gap-y-12 lg:grid-cols-12">
+           <div className="order-1 min-w-0 lg:col-span-7">
             <p className="eyebrow mb-4">The comparison · 2014 – {data.quadrant.economy.end}</p>
             <h2 id="whole" className="max-w-[20ch] font-display text-3xl leading-[1.15]
                                       tracking-tight sm:text-4xl">
@@ -191,7 +195,7 @@ export default function Home() {
 
            {/* The buttons used to sit out here on the right. Moving them under the
                headline frees this column for a piece that stands on its own. */}
-           <aside className="min-w-0 lg:col-span-5">
+           <aside className="order-4 min-w-0 lg:order-2 lg:col-span-5">
              <div className="rounded-lg border border-accent/25 bg-accent/[0.03] p-6 shadow-card">
                <p className="eyebrow mb-3 text-accent">Separate audit</p>
                <h3 className="max-w-[22ch] font-display text-2xl leading-[1.2] tracking-tight">
@@ -211,15 +215,13 @@ export default function Home() {
                </Link>
              </div>
            </aside>
-          </div>
 
-          <div className="grid gap-12 lg:grid-cols-12">
-            <div className="min-w-0 lg:col-span-7">
-              <Quadrant data={data.quadrant} />
-            </div>
-            <div className="min-w-0 lg:col-span-5">
-              <SecurityRadar />
-            </div>
+           <div className="order-2 min-w-0 lg:order-3 lg:col-span-7">
+             <Quadrant data={data.quadrant} />
+           </div>
+           <div className="order-3 min-w-0 lg:order-4 lg:col-span-5">
+             <SecurityRadar />
+           </div>
           </div>
 
 
